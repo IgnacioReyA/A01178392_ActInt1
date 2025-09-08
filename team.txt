@@ -5,7 +5,7 @@ Fernando Gael Hernández Salazar - A01029264
 Substring común más largo
 
 Carlos Daniel Lara - A01711690
-
+Búsqueda de palíndromos
 
 Ignacio Rey Arslangul - A01178392 
 Busqueda de subsecuencias
