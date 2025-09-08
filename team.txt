@@ -1,5 +1,5 @@
 Andre Milan Guzman Ramos - A01199013
-
+Huffman Coding
 
 Fernando Gael Hernández Salazar - A01029264
 Substring común más largo
