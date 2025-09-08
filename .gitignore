@@ -42,3 +42,7 @@
 
 # Executable named "main" (Linux/macOS)
 main
+
+# VS Code files
+
+.vscode
