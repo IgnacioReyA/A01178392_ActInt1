@@ -2,4 +2,3 @@
 #define SUBSECUENCIAS_H
 
 #endif
-Checando merge vs
