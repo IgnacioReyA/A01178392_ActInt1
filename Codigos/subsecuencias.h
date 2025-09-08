@@ -2,4 +2,5 @@
 #define SUBSECUENCIAS_H
 
 #endif
-jfgirjf
+
+lol
