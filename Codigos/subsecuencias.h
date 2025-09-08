@@ -2,6 +2,4 @@
 #define SUBSECUENCIAS_H
 
 #endif
-branchtest
-
-fjeoajfsmmmm
+Checando merge vs
