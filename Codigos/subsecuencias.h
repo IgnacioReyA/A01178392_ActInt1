@@ -9,7 +9,7 @@ string subsecuencias(string transmission, string mcode)
     int sizeT = transmission.size();
     int sizeM = mcode.size();
     
-    int j = 0; // Índice para mcode
+    int j = 0; //indice para mcode
     int startPos = -1; // Posición donde inicia la subsecuencia
     
     for (int i = 0; i < sizeT && j < sizeM; i++) {

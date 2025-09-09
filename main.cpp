@@ -48,6 +48,15 @@ int main() {
     cout << "mcode1: " << subsecuencias(transmission2, mcode1) << endl;
     cout << "mcode2: " << subsecuencias(transmission2, mcode2) << endl;
     cout << "mcode3: " << subsecuencias(transmission2, mcode3) << endl;
+
     
+    
+    
+    // auto res = longest_palindrome_positions(transmission1);
+    auto res = longest_palindrome_positions_ignore_whitespace(transmission1);
+    cout << "\n ==== Parte 2 ====" << endl;
+    cout << "\nTransmission2.txt:" << endl;
+    cout << res.first << " " << res.second << "\n";
+
     return 0;
 }
