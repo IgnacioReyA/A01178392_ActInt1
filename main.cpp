@@ -55,8 +55,12 @@ int main() {
     // auto res = longest_palindrome_positions(transmission1);
     auto res = longest_palindrome_positions_ignore_whitespace(transmission1);
     cout << "\n ==== Parte 2 ====" << endl;
-    cout << "\nTransmission2.txt:" << endl;
+    cout << "\nTransmission1.txt:" << endl;
     cout << res.first << " " << res.second << "\n";
+    cout << "\nTransmission2.txt:" << endl;
+    res = longest_palindrome_positions_ignore_whitespace(transmission2);
+    cout << res.first << " " << res.second << "\n";
+
 
     return 0;
 }
