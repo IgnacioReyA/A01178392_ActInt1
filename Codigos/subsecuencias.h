@@ -9,21 +9,22 @@ string subsecuencias(string transmission, string mcode)
     int sizeT = transmission.size();
     int sizeM = mcode.size();
     
-    int j = 0; //indice para mcode
-    int startPos = -1; // Posición donde inicia la subsecuencia
-    
-    for (int i = 0; i < sizeT && j < sizeM; i++) {
-        if (transmission[i] == mcode[j]) {
-            if (j == 0) {
-                startPos = i + 1; // Guardar posición del primer carácter (base 1)
-            }
-            j++;
-        }
+    // Si mcode está vacío, se considera encontrado en posición 1
+    if (sizeM == 0) {
+        return "true 1";
     }
     
-    // Si encontramos todos los caracteres de mcode en orden
-    if (j == sizeM) {
-        return "true " + to_string(startPos);
+    // Buscar la subcadena (substring) contigua
+    for (int i = 0; i <= sizeT - sizeM; i++) {
+        int j = 0;
+        // Verificar si la subcadena coincide desde la posición i
+        while (j < sizeM && transmission[i + j] == mcode[j]) {
+            j++;
+        }
+        // Si j llegó al final de mcode, se encontró la subcadena completa
+        if (j == sizeM) {
+            return "true " + to_string(i + 1); // +1 para posición basada en 1
+        }
     }
     
     return "false";
