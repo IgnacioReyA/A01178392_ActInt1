@@ -6,7 +6,8 @@
 
 using namespace std;
 
-int main() {
-    cout << "Hello, World!" << endl;
+int main()
+{
+    cout << substring("./Archivos Entrada/transmission1.txt", "./Archivos Entrada/transmission2.txt");
     return 0;
 }
