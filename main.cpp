@@ -64,5 +64,11 @@ int main()
     res = longest_palindrome_positions_ignore_whitespace(transmission2);
     cout << res.first << " " << res.second << "\n";
 
+    // Buscar el substring mas largo común entre transmission1 y transmission2
+    cout << "\n ==== Parte 3 - Substring común más largo ====" << endl;
+    cout << "\nSubstring más largo común entre transmission1 y transmission2:" << endl;
+    string lcs = substring(transmission1, transmission2);
+    cout << lcs << "\n";
+
     return 0;
 }
