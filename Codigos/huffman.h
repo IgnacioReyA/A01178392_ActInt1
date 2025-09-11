@@ -1,3 +1,9 @@
+/*
+ * Detector de codigos sospechosos usando Huffman
+ * Milan Guzman - A01199013
+ * 2025-09-10
+ */
+
 #ifndef HUFFMAN_H
 #define HUFFMAN_H
 #include <iostream>
@@ -8,96 +14,138 @@
 #include <memory>
 using namespace std;
 
-// Nodo del árbol Huffman
 struct HuffmanNode {
-    char character;
-    int frequency;
-    shared_ptr<HuffmanNode> left;
-    shared_ptr<HuffmanNode> right;
+    char character;  // El caracter (solo en hojas)
+    int frequency;   // Cuantas veces aparece
+    shared_ptr<HuffmanNode> left;   // Rama izquierda (0)
+    shared_ptr<HuffmanNode> right;  // Rama derecha (1)
 
-    HuffmanNode(char ch, int freq)
-        : character(ch), frequency(freq), left(nullptr), right(nullptr) {}
+    HuffmanNode(char ch, int freq) {
+        character = ch;
+        frequency = freq;
+        left = nullptr;
+        right = nullptr;
+    }
 
-    HuffmanNode(int freq, shared_ptr<HuffmanNode> l, shared_ptr<HuffmanNode> r)
-        : character('\0'), frequency(freq), left(l), right(r) {}
+    HuffmanNode(int freq, shared_ptr<HuffmanNode> l, shared_ptr<HuffmanNode> r) {
+        character = '\0';
+        frequency = freq;
+        left = l;
+        right = r;
+    }
 };
 
-// Comparador para priority_queue
 struct CompareNodes {
+    // Comparador para que la priority_queue sea un min-heap
     bool operator()(const shared_ptr<HuffmanNode>& a, const shared_ptr<HuffmanNode>& b) {
         return a->frequency > b->frequency;
     }
 };
 
+
 class HuffmanDetector {
 private:
-    unordered_map<char, int> frequencyMap;
-    unordered_map<char, string> huffmanCodes;
-    shared_ptr<HuffmanNode> root;
-    double expectedAvgLength;
-    int totalChars;
+    // Constantes para detectar codigos sospechosos
+    static const int RARE_THRESHOLD = 20;  // Menos de 20 = caracter raro
+    static constexpr double LENGTH_THRESHOLD = 1.1;  // 110% de la longitud esperada
+    static const int PENALTY_BITS = 8;  // Penalizacion para caracteres desconocidos
+    static constexpr double RARE_CHAR_PERCENTAGE = 0.3;  // 30% de caracteres raros
+    static constexpr double RARE_CHAR_LENGTH_THRESHOLD = 1.05;  // 105% con caracteres raros
 
+    unordered_map<char, int> frequencyMap;  // Cuenta apariciones de cada caracter
+    unordered_map<char, string> huffmanCodes;  // Codigo binario de cada caracter
+    shared_ptr<HuffmanNode> root;  // Raiz del arbol de Huffman
+    double expectedAvgLength;  // Longitud promedio esperada
+    int totalChars;  // Total de caracteres procesados
+
+    // Cuenta cuantas veces aparece cada caracter
     void calculateFrequencies(const string& text) {
         frequencyMap.clear();
         totalChars = 0;
+        
         for (char c : text) {
-            if (c != '\n' && c != '\r') {
+            if (c != '\n' && c != '\r') {  // Ignorar saltos de linea
                 frequencyMap[c]++;
                 totalChars++;
             }
         }
     }
 
+    // Construye el arbol de Huffman
     void buildHuffmanTree() {
-        if (frequencyMap.empty()) return;
+        if (frequencyMap.empty()) {
+            return;
+        }
 
         priority_queue<shared_ptr<HuffmanNode>, vector<shared_ptr<HuffmanNode>>, CompareNodes> minHeap;
 
+        // Crear nodos hoja para cada caracter
         for (const auto& pair : frequencyMap) {
             minHeap.push(make_shared<HuffmanNode>(pair.first, pair.second));
         }
 
+        // Algoritmo de Huffman: combinar nodos hasta tener solo uno
         while (minHeap.size() > 1) {
-            auto left = minHeap.top(); minHeap.pop();
-            auto right = minHeap.top(); minHeap.pop();
+            auto left = minHeap.top();  // Menor frecuencia
+            minHeap.pop();
+            auto right = minHeap.top();  // Segunda menor frecuencia
+            minHeap.pop();
+            
             int combinedFreq = left->frequency + right->frequency;
             auto newNode = make_shared<HuffmanNode>(combinedFreq, left, right);
             minHeap.push(newNode);
         }
 
-        root = minHeap.top();
+        root = minHeap.top();  // El ultimo nodo es la raiz
         huffmanCodes.clear();
-        generateCodes(root, "");
+        generateCodes(root, "");  // Generar codigos binarios
         calculateExpectedAvgLength();
     }
 
+
+    // Genera los codigos binarios para cada caracter
     void generateCodes(shared_ptr<HuffmanNode> node, string code) {
-        if (!node) return;
-        if (!node->left && !node->right) {
-            huffmanCodes[node->character] = code;
+        if (!node) {
             return;
         }
-        generateCodes(node->left, code + "0");
-        generateCodes(node->right, code + "1");
+        
+        if (!node->left && !node->right) {  // Es una hoja
+            huffmanCodes[node->character] = code;  // Guardar codigo del caracter
+            return;
+        }
+        
+        generateCodes(node->left, code + "0");   // Izquierda = 0
+        generateCodes(node->right, code + "1");  // Derecha = 1
     }
 
+    // Calcula la longitud promedio de los codigos
     void calculateExpectedAvgLength() {
         expectedAvgLength = 0.0;
-        if (totalChars == 0) return;
+        if (totalChars == 0) {
+            return;
+        }
+        
         for (const auto& pair : frequencyMap) {
-            double probability = static_cast<double>(pair.second) / totalChars;
-            expectedAvgLength += probability * huffmanCodes[pair.first].length();
+            double probability = static_cast<double>(pair.second) / totalChars;  // Probabilidad del caracter
+            expectedAvgLength += probability * huffmanCodes[pair.first].length();  // Peso * longitud
         }
     }
 
+    // Convierte texto a codigo binario
     string encodeText(const string& text) {
         string encoded;
+        
         for (char c : text) {
             if (c != '\n' && c != '\r') {
                 if (huffmanCodes.find(c) != huffmanCodes.end()) {
-                    encoded += huffmanCodes[c];
+                    encoded += huffmanCodes[c];  // Usar codigo Huffman
                 } else {
-                    encoded += "00000000"; // Caracter no encontrado
+                    // Caracter desconocido = penalizacion alta
+                    string penalty = "";
+                    for (int i = 0; i < PENALTY_BITS; i++) {
+                        penalty += "0";
+                    }
+                    encoded += penalty;
                 }
             }
         }
@@ -105,21 +153,35 @@ private:
     }
 
 public:
-    HuffmanDetector() : expectedAvgLength(0.0), totalChars(0) {}
+    // Constructor
+    HuffmanDetector() {
+        expectedAvgLength = 0.0;
+        totalChars = 0;
+    }
 
+    // Procesa la transmision y crea el arbol
     void processTransmission(const string& transmission) {
-        if (transmission.empty()) return;
+        if (transmission.empty()) {
+            return;
+        }
         calculateFrequencies(transmission);
         buildHuffmanTree();
     }
 
+    // Checa si un codigo es sospechoso
     string checkSuspicious(const string& mcode) {
-        if (mcode.empty()) return "no-sospechoso 0";
+        if (mcode.empty()) {
+            return "no-sospechoso 0";
+        }
+        
         string encoded = encodeText(mcode);
         int encodedLength = encoded.length();
-        if (expectedAvgLength == 0.0) return "no-sospechoso " + to_string(encodedLength);
         
-        // Calcular longitud esperada basada en caracteres que existen en la transmisión
+        if (expectedAvgLength == 0.0) {
+            return "no-sospechoso " + to_string(encodedLength);
+        }
+        
+        // Calcular longitud esperada para este codigo
         double expectedLength = 0.0;
         int validChars = 0;
         int rareCharCount = 0;
@@ -130,27 +192,24 @@ public:
                     int codeLength = huffmanCodes[c].length();
                     expectedLength += codeLength;
                     
-                    // Considerar caracteres raros (frecuencia baja en la transmisión)
-                    // Usar umbral fijo basado en análisis de las transmisiones
-                    int rareThreshold = 20; // Caracteres con menos de 20 apariciones son raros
-                    if (frequencyMap[c] < rareThreshold) {
+                    if (frequencyMap[c] < RARE_THRESHOLD) {  // Caracter raro
                         rareCharCount++;
                     }
                 } else {
-                    // Caracter no encontrado en la transmisión - muy sospechoso
-                    expectedLength += 8; // Penalización alta
+                    expectedLength += PENALTY_BITS;  // Caracter desconocido
                     rareCharCount++;
                 }
                 validChars++;
             }
         }
         
-        if (validChars == 0) return "no-sospechoso " + to_string(encodedLength);
+        if (validChars == 0) {
+            return "no-sospechoso " + to_string(encodedLength);
+        }
         
-        // Umbral más estricto: 1.1 veces la longitud esperada
-        double threshold = expectedLength * 1.1;
+        double threshold = expectedLength * LENGTH_THRESHOLD;  // 110% de lo esperado
         
-        // También considerar si hay caracteres no encontrados en la transmisión
+        // Verificar caracteres desconocidos
         bool hasUnknownChars = false;
         for (char c : mcode) {
             if (c != '\n' && c != '\r' && huffmanCodes.find(c) == huffmanCodes.end()) {
@@ -159,13 +218,9 @@ public:
             }
         }
         
-        // Código sospechoso si:
-        // 1. Tiene caracteres no encontrados en la transmisión
-        // 2. La longitud codificada excede el umbral
-        // 3. Tiene caracteres raros (más del 30% de los caracteres)
-        // 4. Tiene al menos un carácter raro y longitud alta
-        bool hasManyRareChars = (double)rareCharCount / validChars > 0.3;
-        bool hasRareCharsAndHighLength = rareCharCount > 0 && encodedLength > expectedLength * 1.05;
+        // Criterios para marcar como sospechoso
+        bool hasManyRareChars = (double)rareCharCount / validChars > RARE_CHAR_PERCENTAGE;  // >30% raros
+        bool hasRareCharsAndHighLength = rareCharCount > 0 && encodedLength > expectedLength * RARE_CHAR_LENGTH_THRESHOLD;
         
         if (hasUnknownChars || encodedLength > threshold || hasManyRareChars || hasRareCharsAndHighLength) {
             return "sospechoso " + to_string(encodedLength);
@@ -174,12 +229,18 @@ public:
         }
     }
 
+    // Obtiene el tamano del texto comprimido
     int getCompressedSize(const string& text) {
-        if (text.empty()) return 0;
+        if (text.empty()) {
+            return 0;
+        }
         return encodeText(text).length();
     }
 
-    double getExpectedAvgLength() const { return expectedAvgLength; }
+    // Obtiene la longitud promedio esperada
+    double getExpectedAvgLength() const {
+        return expectedAvgLength;
+    }
 };
 
 #endif // HUFFMAN_H
