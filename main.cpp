@@ -41,28 +41,8 @@ int main() {
     string mcode2_content = leerArchivo("Archivos Entrada/mcode2.txt");
     string mcode3_content = leerArchivo("Archivos Entrada/mcode3.txt");
 
-    // Procesar transmisión 1
-    HuffmanDetector detector1;
-    detector1.processTransmission(transmission1_content);
-
-    // Verificar códigos con transmisión 1
-    cout << "Verificando códigos con árbol de transmisión 1:" << endl;
-    cout << "mcode1.txt: " << detector1.checkSuspicious(mcode1_content) << endl;
-    cout << "mcode2.txt: " << detector1.checkSuspicious(mcode2_content) << endl;
-    cout << "mcode3.txt: " << detector1.checkSuspicious(mcode3_content) << endl << endl;
-
-    // Procesar transmisión 2
-    HuffmanDetector detector2;
-    detector2.processTransmission(transmission2_content);
-
-    // Verificar códigos con transmisión 2
-    cout << "Verificando códigos con árbol de transmisión 2:" << endl;
-    cout << "mcode1.txt: " << detector2.checkSuspicious(mcode1_content) << endl;
-    cout << "mcode2.txt: " << detector2.checkSuspicious(mcode2_content) << endl;
-    cout << "mcode3.txt: " << detector2.checkSuspicious(mcode3_content) << endl;
-
-    // Parte 1: Búsqueda de subsecuencias
-    cout << "=== Parte 1 - Búsqueda de subsecuencias ===" << endl;
+    // Búsqueda de subsecuencias
+    cout << "\n=== Parte 1 - Búsqueda de subsecuencias ===" << endl;
 
     // Leer archivos de transmisión
     string transmission1 = leerArchivo("Archivos Entrada/transmission1.txt");
@@ -99,6 +79,29 @@ int main() {
     cout << "\nSubstring más largo común entre transmission1 y transmission2:" << endl;
     string lcs = substring(transmission1, transmission2);
     cout << lcs << "\n";
+
+    // Huffman
+    cout << "\n=== Parte 4 - Huffman Coding ===\n" << endl;
+
+    // Procesar transmisión 1
+    HuffmanDetector detector1;
+    detector1.processTransmission(transmission1_content);
+
+    // Verificar códigos con transmisión 1
+    cout << "Verificando códigos con árbol de transmisión 1:" << endl;
+    cout << "mcode1.txt: " << detector1.checkSuspicious(mcode1_content) << endl;
+    cout << "mcode2.txt: " << detector1.checkSuspicious(mcode2_content) << endl;
+    cout << "mcode3.txt: " << detector1.checkSuspicious(mcode3_content) << endl << endl;
+
+    // Procesar transmisión 2
+    HuffmanDetector detector2;
+    detector2.processTransmission(transmission2_content);
+
+    // Verificar códigos con transmisión 2
+    cout << "Verificando códigos con árbol de transmisión 2:" << endl;
+    cout << "mcode1.txt: " << detector2.checkSuspicious(mcode1_content) << endl;
+    cout << "mcode2.txt: " << detector2.checkSuspicious(mcode2_content) << endl;
+    cout << "mcode3.txt: " << detector2.checkSuspicious(mcode3_content) << endl;
 
     return 0;
 }
